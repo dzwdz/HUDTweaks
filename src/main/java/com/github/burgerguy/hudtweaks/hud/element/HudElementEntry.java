@@ -7,6 +7,7 @@ import com.github.burgerguy.hudtweaks.hud.tree.AbstractTypeNodeEntry;
 import com.github.burgerguy.hudtweaks.util.Util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 import com.google.gson.annotations.SerializedName;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
@@ -221,7 +222,32 @@ public abstract class HudElementEntry extends AbstractTypeNodeEntry {
 		xScale = elementJson.get("xScale").getAsDouble();
 		yScale = elementJson.get("yScale").getAsDouble();
 	}
-	
+
+	public JsonObject toJson(JsonSerializationContext context) {
+		JsonObject xPosObject = new JsonObject();
+		xPosObject.add("posType", context.serialize(getXPosType()));
+		xPosObject.addProperty("parent", getXParent().getElementIdentifier().toString());
+		xPosObject.add("anchorPos", context.serialize(getXAnchorPos()));
+		xPosObject.add("relativePos", context.serialize(getXRelativePos()));
+		xPosObject.add("offset", context.serialize(getXOffset()));
+
+		JsonObject yPosObject = new JsonObject();
+		yPosObject.add("posType", context.serialize(getYPosType()));
+		yPosObject.addProperty("parent", getYParent().getElementIdentifier().toString());
+		yPosObject.add("anchorPos", context.serialize(getYAnchorPos()));
+		yPosObject.add("relativePos", context.serialize(getYRelativePos()));
+		yPosObject.add("offset", context.serialize(getYOffset()));
+
+		//JsonObject entryObject = DEFAULT_GSON.toJsonTree(entry, TypeToken.of(Object.class).getType()).getAsJsonObject();
+		JsonObject entryObject = new JsonObject(); // TODO
+		entryObject.add("xPos", xPosObject);
+		entryObject.add("yPos", yPosObject);
+		entryObject.add("xScale", context.serialize(getXScale()));
+		entryObject.add("yScale", context.serialize(getYScale()));
+
+		return entryObject;
+	}
+
 	/**
 	 * Override if any extra options are added to the element.
 	 * Make sure to call super before anything else.
