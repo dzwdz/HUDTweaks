@@ -1,18 +1,27 @@
 package com.github.burgerguy.hudtweaks.gui.widget;
 
+import com.github.burgerguy.hudtweaks.util.Util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
 
 public abstract class HTSliderWidget extends SliderWidget implements ValueUpdatable {
 	private static final int HANDLE_WIDTH = 7;
 
-	public HTSliderWidget(int x, int y, int width, int height, double value) {
-		super(x, y, width, height, LiteralText.EMPTY, value);
+	private final double step;
+	private final String translationKey;
+
+	public HTSliderWidget(double value, double step, String translationKey) {
+		// x, y, width are set by the container
+		// height is static
+		super(-1, -1, -1, 14, LiteralText.EMPTY, value);
+		this.step = step;
+		this.translationKey = translationKey;
 		setAlpha(0.8F);
 		updateMessage();
 	}
@@ -60,7 +69,7 @@ public abstract class HTSliderWidget extends SliderWidget implements ValueUpdata
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		boolean bl = keyCode == 263;
 		if (bl || keyCode == 262) {
-			double f = bl ? -1.0 : 1.0;
+			double f = bl ? -step : step;
 			setValue(value + f / (width - HANDLE_WIDTH));
 			return true;
 		}
@@ -86,5 +95,9 @@ public abstract class HTSliderWidget extends SliderWidget implements ValueUpdata
 	protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
 		setValueFromMouse(mouseX);
 	}
-	
+
+	@Override
+	protected void updateMessage() {
+		setMessage(new TranslatableText("hudtweaks.options.relative_pos.display", Util.RELATIVE_POS_FORMATTER.format(value)));
+	}
 }

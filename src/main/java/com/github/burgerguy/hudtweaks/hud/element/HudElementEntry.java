@@ -260,33 +260,18 @@ public abstract class HudElementEntry extends AbstractTypeNodeEntry {
 	 */
 	@SuppressWarnings("resource")
 	public void fillSidebar(SidebarWidget sidebar) {
-		ParentButtonWidget xRelativeParentButton = new ParentButtonWidget(4, 35, sidebar.width - 8, 14, getXParent(), getParentNode(), p -> moveXUnder(p), true);
+		ParentButtonWidget xRelativeParentButton = new ParentButtonWidget(4, 35, sidebar.width - 8, 14, getXParent(), getParentNode(), this::moveXUnder, true);
 		
-		ParentButtonWidget yRelativeParentButton = new ParentButtonWidget(4, 143, sidebar.width - 8, 14, getYParent(), getParentNode(), p -> moveYUnder(p), false);
+		ParentButtonWidget yRelativeParentButton = new ParentButtonWidget(4, 143, sidebar.width - 8, 14, getYParent(), getParentNode(), this::moveYUnder, false);
 		
 		xRelativeParentButton.active = !xPosType.equals(PosType.DEFAULT);
 		yRelativeParentButton.active = !yPosType.equals(PosType.DEFAULT);
 		
-		HTSliderWidget xRelativeSlider = new HTSliderWidget(4, 54, sidebar.width - 8, 14, xRelativePos) {
-			@Override
-			protected void updateMessage() {
-				setMessage(new TranslatableText("hudtweaks.options.relative_pos.display", Util.RELATIVE_POS_FORMATTER.format(value)));
-			}
-			
+		HTSliderWidget xRelativeSlider = new HTSliderWidget(xRelativePos, 0.001, "hudtweaks.options.relative_pos.display") {
 			@Override
 			public void applyValue() {
 				xRelativePos = value;
 				parentNode.setRequiresUpdate();
-			}
-			
-			@Override
-			public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-				boolean bl = keyCode == 263;
-				if (bl || keyCode == 262) {
-					setValue(value + (bl ? -0.001 : 0.001));
-					return true;
-				}
-				return false;
 			}
 
 			@Override
@@ -296,26 +281,11 @@ public abstract class HudElementEntry extends AbstractTypeNodeEntry {
 			}
 		};
 		
-		HTSliderWidget yRelativeSlider = new HTSliderWidget(4, 162, sidebar.width - 8, 14, yRelativePos) {
-			@Override
-			protected void updateMessage() {
-				setMessage(new TranslatableText("hudtweaks.options.relative_pos.display", Util.RELATIVE_POS_FORMATTER.format(value)));
-			}
-			
+		HTSliderWidget yRelativeSlider = new HTSliderWidget(yRelativePos, 0.001, "hudtweaks.options.relative_pos.display") {
 			@Override
 			public void applyValue() {
 				yRelativePos = value;
 				parentNode.setRequiresUpdate();
-			}
-			
-			@Override
-			public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-				boolean bl = keyCode == 263;
-				if (bl || keyCode == 262) {
-					setValue(value + (bl ? -0.001 : 0.001));
-					return true;
-				}
-				return false;
 			}
 
 			@Override
@@ -328,26 +298,11 @@ public abstract class HudElementEntry extends AbstractTypeNodeEntry {
 		xRelativeSlider.active = !xPosType.equals(PosType.DEFAULT);
 		yRelativeSlider.active = !yPosType.equals(PosType.DEFAULT);
 		
-		HTSliderWidget xAnchorSlider = new HTSliderWidget(4, 73, sidebar.width - 8, 14, xAnchorPos) {
-			@Override
-			protected void updateMessage() {
-				setMessage(new TranslatableText("hudtweaks.options.anchor_pos.display", Util.ANCHOR_POS_FORMATTER.format(value)));
-			}
-			
+		HTSliderWidget xAnchorSlider = new HTSliderWidget(xAnchorPos, 0.001, "hudtweaks.options.relative_pos.display") {
 			@Override
 			public void applyValue() {
 				xAnchorPos = value;
 				parentNode.setRequiresUpdate();
-			}
-			
-			@Override
-			public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-				boolean bl = keyCode == 263;
-				if (bl || keyCode == 262) {
-					setValue(value + (bl ? -0.001 : 0.001));
-					return true;
-				}
-				return false;
 			}
 
 			@Override
@@ -357,26 +312,11 @@ public abstract class HudElementEntry extends AbstractTypeNodeEntry {
 			}
 		};
 		
-		HTSliderWidget yAnchorSlider = new HTSliderWidget(4, 181, sidebar.width - 8, 14, yAnchorPos) {
-			@Override
-			protected void updateMessage() {
-				setMessage(new TranslatableText("hudtweaks.options.anchor_pos.display", Util.ANCHOR_POS_FORMATTER.format(value)));
-			}
-			
+		HTSliderWidget yAnchorSlider = new HTSliderWidget(yAnchorPos, 0.001, "hudtweaks.options.relative_pos.display") {
 			@Override
 			public void applyValue() {
 				yAnchorPos = value;
 				parentNode.setRequiresUpdate();
-			}
-			
-			@Override
-			public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-				boolean bl = keyCode == 263;
-				if (bl || keyCode == 262) {
-					setValue(value + (bl ? -0.001 : 0.001));
-					return true;
-				}
-				return false;
 			}
 
 			@Override
@@ -405,86 +345,58 @@ public abstract class HudElementEntry extends AbstractTypeNodeEntry {
 			yRelativeParentButton.active = !t.equals(PosType.DEFAULT);
 		});
 		
-		NumberFieldWidget xOffsetField = new NumberFieldWidget(MinecraftClient.getInstance().textRenderer, 43, 92, sidebar.width - 47, 14, new TranslatableText("hudtweaks.options.offset.name")) {
+		NumberFieldWidget xOffsetField = new NumberFieldWidget(new TranslatableText("hudtweaks.options.offset.name")) {
+			@Override
+			protected void applyValue(double d) {
+				xOffset = d;
+				parentNode.setRequiresUpdate();
+			}
+
 			@Override
 			public void updateValue() {
 				setText(Double.toString(xOffset));
 			}
 		};
-		xOffsetField.setText(Double.toString(xOffset));
-		xOffsetField.setChangedListener(s -> {
-			if (s.equals("")) {
-				xOffset = 0.0D;
-				parentNode.setRequiresUpdate();
-			} else {
-				try {
-					xOffset = Double.parseDouble(s);
-					parentNode.setRequiresUpdate();
-				} catch(NumberFormatException ignored) {}
-			}
-		});
 		
-		NumberFieldWidget yOffsetField = new NumberFieldWidget(MinecraftClient.getInstance().textRenderer, 43, 200, sidebar.width - 47, 14, new TranslatableText("hudtweaks.options.offset.name")) {
+		NumberFieldWidget yOffsetField = new NumberFieldWidget(new TranslatableText("hudtweaks.options.offset.name")) {
+			@Override
+			protected void applyValue(double d) {
+				yOffset = d;
+				parentNode.setRequiresUpdate();
+			}
+
 			@Override
 			public void updateValue() {
 				setText(Util.NUM_FIELD_FORMATTER.format(yOffset));
 			}
 		};
-		yOffsetField.setText(Util.NUM_FIELD_FORMATTER.format(yOffset));
-		yOffsetField.setChangedListener(s -> {
-			if (s.equals("")) {
-				yOffset = 0.0D;
+		
+		
+		NumberFieldWidget xScaleField = new NumberFieldWidget(new TranslatableText("hudtweaks.options.x_scale.name")) {
+			@Override
+			protected void applyValue(double d) {
+				xScale = Math.max(0, d);
 				parentNode.setRequiresUpdate();
-			} else {
-				try {
-					yOffset = Double.parseDouble(s);
-					parentNode.setRequiresUpdate();
-				} catch(NumberFormatException ignored) {}
 			}
-		});
-		
-		
-		NumberFieldWidget xScaleField = new NumberFieldWidget(MinecraftClient.getInstance().textRenderer, 48, 232, sidebar.width - 52, 14, new TranslatableText("hudtweaks.options.x_scale.name")) {
+
 			@Override
 			public void updateValue() {
 				setText(Util.NUM_FIELD_FORMATTER.format(xScale));
 			}
 		};
-		xScaleField.setText(Util.NUM_FIELD_FORMATTER.format(xScale));
-		xScaleField.setChangedListener(s -> {
-			if (s.equals("")) {
-				xScale = 0.0D;
-				parentNode.setRequiresUpdate();
-			} else {
-				try {
-					double value = Double.parseDouble(s);
-					double lastValue = xScale;
-					xScale = value < 0.0D ? 0.0D : value;
-					if (xScale != lastValue) parentNode.setRequiresUpdate();
-				} catch(NumberFormatException ignored) {}
-			}
-		});
 		
-		NumberFieldWidget yScaleField = new NumberFieldWidget(MinecraftClient.getInstance().textRenderer, 48, 251, sidebar.width - 52, 14, new TranslatableText("hudtweaks.options.y_scale.name")) {
+		NumberFieldWidget yScaleField = new NumberFieldWidget(new TranslatableText("hudtweaks.options.y_scale.name")) {
+			@Override
+			protected void applyValue(double d) {
+				yScale = Math.max(0, d);
+				parentNode.setRequiresUpdate();
+			}
+
 			@Override
 			public void updateValue() {
 				setText(Util.NUM_FIELD_FORMATTER.format(yScale));
 			}
 		};
-		yScaleField.setText(Util.NUM_FIELD_FORMATTER.format(yScale));
-		yScaleField.setChangedListener(s -> {
-			if (s.equals("")) {
-				yScale = 0.0D;
-				parentNode.setRequiresUpdate();
-			} else {
-				try {
-					double value = Double.parseDouble(s);
-					double lastValue = yScale;
-					yScale = value < 0.0D ? 0.0D : value;
-					if (yScale != lastValue) parentNode.setRequiresUpdate();
-				} catch(NumberFormatException ignored) {}
-			}
-		});
 		
 		sidebar.addDrawable(xPosTypeButton);
 		sidebar.addDrawable(xRelativeParentButton);

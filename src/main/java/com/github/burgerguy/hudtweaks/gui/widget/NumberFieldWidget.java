@@ -1,12 +1,13 @@
 package com.github.burgerguy.hudtweaks.gui.widget;
 
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
-public class NumberFieldWidget extends HTTextFieldWidget implements ValueUpdatable {
-
-	public NumberFieldWidget(TextRenderer textRenderer, int x, int y, int width, int height, Text text) {
-		super(textRenderer, x, y, width, height, text);
+public abstract class NumberFieldWidget extends HTTextFieldWidget implements ValueUpdatable {
+	public NumberFieldWidget(Text text) {
+		super(MinecraftClient.getInstance().textRenderer, -1, -1, -1, 14, text);
+		setChangedListener(this::changedListener);
+		updateValue();
 	}
 	
 	@Override
@@ -33,5 +34,17 @@ public class NumberFieldWidget extends HTTextFieldWidget implements ValueUpdatab
 		
 		return sb.toString();
 	}
-	
+
+	protected abstract void applyValue(double d);
+
+	protected void changedListener(String s) {
+		if (s.equals("")) {
+			applyValue(0);
+		} else {
+			try {
+				double d = Double.parseDouble(s);
+				applyValue(d);
+			} catch(NumberFormatException ignored) {}
+		}
+	}
 }
