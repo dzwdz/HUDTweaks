@@ -1,5 +1,6 @@
 package com.github.burgerguy.hudtweaks.hud.element;
 
+import com.github.burgerguy.hudtweaks.config.annotations.Configurable;
 import com.github.burgerguy.hudtweaks.gui.widget.*;
 import com.github.burgerguy.hudtweaks.hud.HTIdentifier;
 import com.github.burgerguy.hudtweaks.hud.HudContainer;
@@ -16,7 +17,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
 
 import java.lang.reflect.Field;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class HudElementEntry extends AbstractTypeNodeEntry {
 	// These are all marked as transient so we can manually add them in our custom serializer
@@ -178,9 +180,13 @@ public abstract class HudElementEntry extends AbstractTypeNodeEntry {
 		return getIdentifier().toString();
 	}
 
-	public Set<Field> getConfigurableFields() {
-		// todo: preferably use reflection
-		return null;
+	public List<Field> getConfigurableFields() {
+		List<Field> fields = new ArrayList<>();
+		for (Field f : getClass().getFields())
+			if (f.isAnnotationPresent(Configurable.class))
+				fields.add(f);
+
+		return fields;
 	}
 	// TODO: everything below should use ^
 

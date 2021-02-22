@@ -1,11 +1,12 @@
 package com.github.burgerguy.hudtweaks.api;
 
+import com.github.burgerguy.hudtweaks.config.annotations.Configurable;
 import com.github.burgerguy.hudtweaks.hud.HudContainer;
 import com.github.burgerguy.hudtweaks.hud.element.HudElementEntry;
 import net.minecraft.client.MinecraftClient;
 
 import java.lang.reflect.Field;
-import java.util.Set;
+import java.util.List;
 
 public class CustomHudElementEntry extends HudElementEntry {
 	PlaceholderName wrapped;
@@ -38,11 +39,12 @@ public class CustomHudElementEntry extends HudElementEntry {
 	}
 
 	@Override
-	public Set<Field> getConfigurableFields() {
-		Set<Field> fields = super.getConfigurableFields(); // get the default fields
+	public List<Field> getConfigurableFields() {
+		List<Field> fields = super.getConfigurableFields(); // get the default fields
 
-		// todo: this would either get the transient fields of this.wrapped via reflection
-		//                      or call some getConfigOptions() function, which would be a disaster of an api
+		for (Field f : wrapped.getClass().getFields())
+			if (f.isAnnotationPresent(Configurable.class))
+				fields.add(f);
 
 		return fields;
 	}

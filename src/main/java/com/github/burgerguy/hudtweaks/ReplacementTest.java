@@ -2,6 +2,7 @@ package com.github.burgerguy.hudtweaks;
 
 import com.github.burgerguy.hudtweaks.api.HudTweaksApi;
 import com.github.burgerguy.hudtweaks.api.PlaceholderName;
+import com.github.burgerguy.hudtweaks.config.annotations.Configurable;
 import com.github.burgerguy.hudtweaks.hud.HTIdentifier;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.MinecraftClient;
@@ -18,6 +19,9 @@ public class ReplacementTest implements HudTweaksApi {
 }
 
 class SomeReplacement extends PlaceholderName {
+    @Configurable
+    public double prettiness = 1.0;
+
     protected SomeReplacement() {
         super(new HTIdentifier("test", "health", "square"), "onHealthRowsChange");
     }
