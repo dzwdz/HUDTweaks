@@ -22,6 +22,10 @@ public class HTIdentifier {
 		this.element = element;
 		this.entryName = entryName;
 	}
+
+	public HTIdentifier(String namespace, String element, String entryName) {
+		this(new ElementType(element, null), new Namespace(namespace, null), new EntryName(entryName, null));
+	}
 	
 	public ElementType getElementType() {
 		return element;
